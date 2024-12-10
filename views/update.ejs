@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Resume Link</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input, button {
+      margin: 5px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    #link {
+      margin-top: 10px;
+      display: block;
+      color: #007BFF;
+      text-decoration: none;
+    }
+    #link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dynamic Resume Uploader</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="resume" accept="application/pdf" required />
+    <button type="submit">Upload Resume</button>
+  </form>
+  <p id="message"></p>
+  <a id="link" href="#" target="_blank" style="display: none;">View Latest Resume</a>
+
+  <script>
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const messageElem = document.getElementById("message");
+      const linkElem = document.getElementById("link");
+      try {
+        const response = await fetch("/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const result = await response.json();
+
+        if (result.link) {
+          messageElem.textContent = "Resume updated successfully!";
+          messageElem.style.color = "green";
+          linkElem.href = result.link;
+          linkElem.textContent = "View Latest Resume";
+          linkElem.style.display = "block";
+        } else {
+          messageElem.textContent = "Error updating resume.";
+          messageElem.style.color = "red";
+          linkElem.style.display = "none";
+        }
+      } catch (error) {
+        messageElem.textContent = "Failed to upload resume. Please try again.";
+        messageElem.style.color = "red";
+        linkElem.style.display = "none";
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
